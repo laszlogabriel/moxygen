@@ -7,7 +7,7 @@
 'use strict';
 
 var fs = require('fs');
-var log = require('winston');
+var logger = require('./logger');
 var path = require('path');
 var handlebars = require('handlebars');
 // var tidyMarkdown = require('tidy-markdown');
@@ -36,7 +36,7 @@ module.exports = {
   render: function (compound) {
     var template;
 
-    log.verbose('Rendering ' + compound.kind + ' ' + compound.fullname);
+    logger.verbose('Rendering ' + compound.kind + ' ' + compound.fullname);
 
     switch (compound.kind) {
       case 'index':
@@ -58,7 +58,7 @@ module.exports = {
         template = 'class';
         break;
       default:
-        log.warn('Cannot render ' + compound.kind + ' ' + compound.fullname);
+        logger.warn('Cannot render ' + compound.kind + ' ' + compound.fullname);
         console.log('Skipping ', compound);
         return undefined;
     }

@@ -7,7 +7,7 @@
 'use strict';
 
 var fs = require('fs');
-var log = require('winston');
+var logger = require('./logger');
 var path = require('path');
 var xml2js = require('xml2js');
 
@@ -223,7 +223,11 @@ module.exports = {
   },
 
   parseMember: function (member, section, memberdef) {
-    log.verbose('Processing member ' + member.kind + ' ' + member.name);
+    if (!member) {
+      logger.verbose('Member undefined')
+      return;
+    }
+    logger.verbose('Processing member ' + member.kind + ' ' + member.name);
     member.section = section;
     copy(member, 'briefdescription', memberdef);
     copy(member, 'detaileddescription', memberdef);
@@ -365,7 +369,7 @@ module.exports = {
   },
 
   parseCompound: function (compound, compounddef) {
-    log.verbose('Processing compound ' + compound.name);
+    logger.verbose('Processing compound ' + compound.name);
     Object.keys(compounddef.$).forEach(function(prop) {
       compound[prop] = compounddef.$[prop];
     });
@@ -497,11 +501,11 @@ module.exports = {
       this.parseMembers(compound, element.$, element.member);
 
       if (compound.kind !== 'file') { // && compound.kind !== 'file'
-        log.verbose('Parsing ' + path.join(options.directory, compound.refid + '.xml'));
+        logger.verbose('Parsing ' + path.join(options.directory, compound.refid + '.xml'));
         doxygen = fs.readFileSync(path.join(options.directory, compound.refid + '.xml'), 'utf8');
         xmlParser.parseString(doxygen, function (err, data) {
           if (err) {
-            log.verbose('warning - parse error for file' , path.join(options.directory, compound.refid + '.xml'))
+            logger.verbose('warning - parse error for file' , path.join(options.directory, compound.refid + '.xml'))
             return;
           }
             this.parseCompound(compound, data.doxygen.compounddef[0]);
@@ -513,7 +517,7 @@ module.exports = {
 
   loadIndex: function (options, callback) {
     this.parserOptions = options;
-    log.verbose('Parsing ' + path.join(options.directory, 'index.xml'));
+    logger.verbose('Parsing ' + path.join(options.directory, 'index.xml'));
     fs.readFile(path.join(options.directory, 'index.xml'), 'utf8', function(err, data) {
       if (err) {
         callback('Failed to load Doxygen XML: ' + err);

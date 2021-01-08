@@ -9,8 +9,7 @@
 var fs = require('fs');
 var path = require('path');
 var util = require('util');
-var log = require('winston');
-var handlebars = require('handlebars');
+var logger = require('./logger');
 
 module.exports = {
 
@@ -115,7 +114,7 @@ module.exports = {
 
   // Write the output file
   writeFile: function (filepath, contents) {
-    log.verbose('Writing', filepath);
+    logger.verbose('Writing ' + filepath);
     var stream = fs.createWriteStream(filepath);
     stream.once('open', function(fd) {
       contents.forEach(function (content) {

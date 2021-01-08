@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-var log = require('winston');
+var logger = require('../src/logger');
 var program = require('commander');
 var assign = require('object-assign');
 var pjson = require('../package.json');
@@ -22,7 +22,7 @@ program.version(pjson.version)
   .parse(process.argv);
 
 if (!program.quiet) {
-  log.level = 'verbose';
+  logger.level = 'verbose';
 }
 
 if (program.args.length) {
