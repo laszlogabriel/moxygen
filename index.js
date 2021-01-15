@@ -132,6 +132,7 @@ module.exports = {
         })
       }
 
+      helpers.writeSummary([templates.summary(helpers.summary)], options)
     });
   }
 }

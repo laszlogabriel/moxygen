@@ -10,11 +10,7 @@ var fs = require('fs');
 var logger = require('./logger');
 var path = require('path');
 var handlebars = require('handlebars');
-// var tidyMarkdown = require('tidy-markdown');
-
-var doxyparser = require('./parser');
 var helpers = require('./helpers');
-var markdown = require('./markdown');
 
 module.exports = {
 
@@ -64,6 +60,11 @@ module.exports = {
     }
     
     return this.templates[template](compound).replace(/(\r\n|\r|\n){3,}/g, '$1\n');
+  },
+
+  summary: function (content) {
+    // return this.templates['summary'](content).replace(/(\r\n|\r|\n){3,}/g, '$1\n');
+    return this.templates['summary'](content);
   },
 
   renderArray: function (compounds) {

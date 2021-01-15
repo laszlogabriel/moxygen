@@ -13,6 +13,10 @@ var logger = require('./logger');
 
 module.exports = {
 
+  summary: {
+    rows: []
+  },
+
   inline: function(code) {
     if (Array.isArray(code)) {
       var refs, s = '', isInline = false;
@@ -100,7 +104,7 @@ module.exports = {
     } else if (options.groups) {
       return util.format(options.output, compound.groupname);
     } else if (options.classes) {
-      return util.format(options.output, compound.name.replace(/\:/g, '-'));
+      return util.format(options.output, compound.name.replace(/\::/g, '-'));
     } else {
       return options.output;
     }
@@ -110,6 +114,7 @@ module.exports = {
     this.writeFile(this.compoundPath(compound, options), contents.map(function(content) {
       return this.resolveRefs(content, compound, references, options);
     }.bind(this)));
+    this.summary.rows.push({ name: compound.name, fname: compound.name.replace(/\::/g, '-') })
   },
 
   // Write the output file
@@ -123,5 +128,10 @@ module.exports = {
       });
       stream.end();
     });
+  },
+
+  writeSummary: function (contents, options) {
+    var fp = path.dirname(options.output) + "/SUMMARY.md";
+    this.writeFile(fp, contents);
   }
 };
