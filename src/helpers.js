@@ -27,25 +27,24 @@ module.exports = {
             // link
             var link = f.match(/\[(.*)\]\((.*)\)/);
             if (link) {
-              isInline ? (s += '`') && (isInline = false) : null;
-              s += '[`' + link[1] + '`](' + link[2] + ')';
+              s += '[' + link[1] + '](' + link[2] + ')';
             }
           }
           else if (f == '\n' || f == '  \n') {
             // line break
-            isInline ? (s += '`') && (isInline = false) : null;
+            isInline ? (s += '<code>') && (isInline = false) : null;
             s += f;
           }
           else if (f) {
-            !isInline ? (s += '`') && (isInline = true) : null;
+            !isInline ? (s += '<code>') && (isInline = true) : null;
             s += f;
           }
         });
       });
-      return s + (isInline ? '`' : '');
+      return s + (isInline ? '</code>' : '');
     }
     else {
-      return '`' + code + '`';
+      return '<code>' + code + '</code>';
     }
   },
 

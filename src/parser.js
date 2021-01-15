@@ -252,7 +252,7 @@ module.exports = {
           }
           m.push('>  \n');
         }
-        m = m.concat(memberdef.$.inline == 'yes' ? ['inline', ' '] : []);
+        // m = m.concat(memberdef.$.inline == 'yes' ? ['inline', ' '] : []);
         m = m.concat(memberdef.$.static == 'yes' ? ['static', ' '] : []);
         m = m.concat(memberdef.$.virt == 'virtual' ? ['virtual', ' '] : []);
         m = m.concat(toMarkdown(memberdef.type), ' ');
@@ -285,7 +285,7 @@ module.exports = {
         break;
 
       case 'property':
-        m = m.concat(['{', member.kind, '} ']);
+        // m = m.concat(['{', member.kind, '} ']);
         m = m.concat(toMarkdown(memberdef.type), ' ');
         // m = m.concat(memberdef.name[0]._);
         m = m.concat(markdown.refLink(member.name, member.refid));
