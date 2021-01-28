@@ -35,10 +35,13 @@ module.exports = {
         'enum',
         // 'enumvalue',
         'func',
+        'function',
         // 'variable',
         'property',
         'public-attrib',
         'public-func',
+        'public-static-attrib',
+        'public-static-func',
         'protected-attrib',
         'protected-func',
         'signal',
@@ -52,6 +55,7 @@ module.exports = {
         'struct',
         'union',
         'typedef',
+        'interface'
         // 'file'
       ]
     }
