@@ -19,7 +19,7 @@ module.exports = {
 
   inline: function(code) {
     if (Array.isArray(code)) {
-      var refs, s = '', isInline = false;
+      var refs, s = '';
       code.forEach(function (e) {
         refs = e.split(/(\[.*\]\(.*\)|\n|\s{2}\n)/g);
         refs.forEach(function (f) {
@@ -30,22 +30,16 @@ module.exports = {
               s += '[' + link[1] + '](' + link[2] + ')';
             }
           }
-          else if (f == '\n' || f == '  \n') {
-            // line break
-            isInline ? (s += '<code>') && (isInline = false) : null;
-            s += f;
-          }
           else if (f) {
-            !isInline ? (s += '<code>') && (isInline = true) : null;
             s += f;
           }
         });
       });
-      return s + (isInline ? '</code>' : '');
+
+      return s;
     }
-    else {
-      return '<code>' + code + '</code>';
-    }
+
+    return code;
   },
 
   getAnchor: function(name, options) {
