@@ -255,7 +255,7 @@ module.exports = {
         // m = m.concat(memberdef.$.inline == 'yes' ? ['inline', ' '] : []);
         m = m.concat(memberdef.$.static == 'yes' ? ['static', ' '] : []);
         m = m.concat(memberdef.$.virt == 'virtual' ? ['virtual', ' '] : []);
-        m = m.concat(toMarkdown(memberdef.type), ' ');
+        m = m.concat(memberdef.$.type ? [toMarkdown(memberdef.type), ' ']: []);
         m = m.concat(memberdef.$.explicit  == 'yes' ? ['explicit', ' '] : []);
         // m = m.concat(memberdef.name[0]._);
         m = m.concat(markdown.refLink(member.name, member.refid));
@@ -325,6 +325,10 @@ module.exports = {
         delete child.parent.compounds[child.id];
     compound.compounds[child.id] = child;
     child.parent = compound;
+  },
+
+  assignToClass: function (compound, child) {
+    compound.compounds[child.id] = child;
   },
 
   assignNamespaceToGroup: function (compound, child) {
@@ -427,14 +431,11 @@ module.exports = {
 
     // kind specific parsing
     switch (compound.kind) {
-      case 'class':
       case 'struct':
       case 'union':
       case 'typedef':
-
-        // set namespace reference
-        var nsp = compound.name.split('::');
-        compound.namespace = nsp.splice(0, nsp.length - 1).join('::');
+      case 'interface':
+        this.setNamespaceRef(compound);
         break;
 
       case 'file':
@@ -445,6 +446,9 @@ module.exports = {
       case 'page':
         this.extractPageSections(compound, compounddef.$$);
         break;
+
+      case 'class':
+        this.setNamespaceRef(compound);
 
       case 'namespace':
       case 'group':
@@ -457,17 +461,23 @@ module.exports = {
         // handle innerclass for groups and namespaces
         if (compounddef.innerclass) {
           compounddef.innerclass.forEach(function (innerclassdef) {
-              if (compound.kind == 'namespace') {
-                // log.verbose('Assign ' + innerclassdef.$.refid + ' to namespace ' + compound.name);
-
+            switch (compound.kind) {
+              case 'namespace':
                 if (this.references[innerclassdef.$.refid])
                   this.assignToNamespace(compound, this.references[innerclassdef.$.refid]);
-              }
-              else if (compound.kind == 'group') {
-                // log.verbose('Assign ' + innerclassdef.$.refid + ' to group ' + compound.name);
+                break;
+              
+              case 'group':
                 if (this.references[innerclassdef.$.refid])
                   this.assignClassToGroup(compound, this.references[innerclassdef.$.refid]);
-              }
+                break;
+
+              case 'class':
+              case 'interface':
+                if (this.references[innerclassdef.$.refid])
+                  this.assignToClass(compound, this.references[innerclassdef.$.refid]);
+                break;
+            }
           }.bind(this));
         }
 
@@ -477,7 +487,8 @@ module.exports = {
           compounddef.innernamespace.forEach(function (namespacedef) {
             if (compound.kind == 'group') {
               // log.verbose('Assign namespace ' + namespacedef.$.refid + ' to group ' + compound.name);
-              this.assignNamespaceToGroup(compound, this.references[namespacedef.$.refid]);
+              if (this.references[innerclassdef.$.refid])
+                this.assignNamespaceToGroup(compound, this.references[namespacedef.$.refid]);
             }
           }.bind(this));
         }
@@ -530,9 +541,16 @@ module.exports = {
           return;
         }
         this.root.kind = 'index';
-        this.parseIndex(this.root, result.doxygenindex.compound, options);
+        this.parseIndex(this.root, result.doxygenindex.compound.sort(function (a, b) {
+          return b.$.refid.length - a.$.refid.length;
+        }), options);
         callback(null, this.root); // TODO: return errors properly
       }.bind(this));
     }.bind(this));
+  },
+
+  setNamespaceRef: function (compound) {
+    var nsp = compound.name.split('::');
+    compound.namespace = nsp.splice(0, nsp.length - 1).join('::');
   }
 };
