@@ -43,6 +43,9 @@ module.exports = {
         break;
       case 'group':
       case 'namespace':
+        if (!Object.keys(compound.compounds).length) {
+          return;
+        }
         if (Object.keys(compound.compounds).length === 1
           && compound.compounds[Object.keys(compound.compounds)[0]].kind == 'namespace') {
           return undefined;
@@ -51,6 +54,7 @@ module.exports = {
         break;
       case 'class':
       case 'struct':
+      case 'interface':
         template = 'class';
         break;
       default:

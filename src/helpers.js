@@ -104,6 +104,7 @@ module.exports = {
   },
 
   writeCompound: function(compound, contents, references, options) {
+    if (!contents[0]) return;
     this.writeFile(this.compoundPath(compound, options), contents.map(function(content) {
       return this.resolveRefs(content, compound, references, options);
     }.bind(this)));
