@@ -12,14 +12,14 @@ var util = require('util');
 var logger = require('./logger');
 
 module.exports = {
-
   summary: {
-    rows: []
+    rows: [],
   },
 
-  inline: function(code) {
+  inline: function (code) {
     if (Array.isArray(code)) {
-      var refs, s = '';
+      var refs,
+        s = '';
       code.forEach(function (e) {
         refs = e.split(/(\[.*\]\(.*\)|\n|\s{2}\n)/g);
         refs.forEach(function (f) {
@@ -29,8 +29,7 @@ module.exports = {
             if (link) {
               s += '[' + link[1] + '](' + link[2] + ')';
             }
-          }
-          else if (f) {
+          } else if (f) {
             s += f;
           }
         });
@@ -42,58 +41,56 @@ module.exports = {
     return code;
   },
 
-  getAnchor: function(name, options) {
+  getAnchor: function (name, options) {
     if (options.anchors) {
       return '{#' + name + '}';
-    }
-    else if (options.htmlAnchors) {
+    } else if (options.htmlAnchors) {
       return '<a id="' + name + '"></a>';
-    }
-    else {
+    } else {
       return '';
     }
   },
 
-  findParent: function(compound, kinds) {
+  findParent: function (compound, kinds) {
     while (compound) {
-      if (kinds.includes(compound.kind))
-        return compound;
+      if (kinds.includes(compound.kind)) return compound;
       compound = compound.parent;
     }
   },
 
   // Replace ref links to point to correct output file if needed
-  resolveRefs: function(content, compound, references, options) {
-    return content.replace(/\{#ref ([^ ]+) #\}/g, function(_, refid) {
-      var ref = references[refid]
-      var page = this.findParent(ref, ['page']);
+  resolveRefs: function (content, compound, references, options) {
+    return content.replace(
+      /\{#ref ([^ ]+) #\}/g,
+      function (_, refid) {
+        var ref = references[refid];
+        var page = this.findParent(ref, ['page']);
 
-      if (page) {
-        if (page.refid == compound.refid)
-          return '#' + refid;
-        return this.compoundPath(page, options) + '#' + refid;
-      }
+        if (page) {
+          if (page.refid == compound.refid) return '#' + refid;
+          return this.compoundPath(page, options) + '#' + refid;
+        }
 
-      if (options.groups) {
-        if (compound.groupid && compound.groupid == ref.groupid)
+        if (options.groups) {
+          if (compound.groupid && compound.groupid == ref.groupid)
+            return '#' + refid;
+          return this.compoundPath(ref, options) + '#' + refid;
+        } else if (options.classes) {
+          var dest = this.findParent(ref, ['namespace', 'class', 'struct']);
+          if (!dest || compound.refid == dest.refid) return '#' + refid;
+          return this.compoundPath(dest, options) + '#' + refid;
+        } else {
+          if (compound.kind == 'page')
+            return this.compoundPath(compound.parent, options) + '#' + refid;
           return '#' + refid;
-        return this.compoundPath(ref, options) + '#' + refid;
-      } else if (options.classes) {
-        var dest = this.findParent(ref, ['namespace', 'class', 'struct']);
-        if (!dest || compound.refid == dest.refid)
-          return '#' + refid;
-        return this.compoundPath(dest, options) + '#' + refid;
-      } else {
-        if (compound.kind == 'page')
-          return this.compoundPath(compound.parent, options) + '#' + refid;
-        return '#' + refid;
-      }
-    }.bind(this));
+        }
+      }.bind(this)
+    );
   },
 
-  compoundPath: function(compound, options) {
+  compoundPath: function (compound, options) {
     if (compound.kind == 'page') {
-      return path.dirname(options.output) + "/page-" + compound.name + ".md";
+      return path.dirname(options.output) + '/page-' + compound.name + '.md';
     } else if (options.groups) {
       return util.format(options.output, compound.groupname);
     } else if (options.classes) {
@@ -103,29 +100,36 @@ module.exports = {
     }
   },
 
-  writeCompound: function(compound, contents, references, options) {
+  writeCompound: function (compound, contents, references, options) {
     if (!contents[0]) return;
-    this.writeFile(this.compoundPath(compound, options), contents.map(function(content) {
-      return this.resolveRefs(content, compound, references, options);
-    }.bind(this)));
-    this.summary.rows.push({ name: compound.name, fname: compound.name.replace(/\::/g, '-') })
+    this.writeFile(
+      this.compoundPath(compound, options),
+      contents.map(
+        function (content) {
+          return this.resolveRefs(content, compound, references, options);
+        }.bind(this)
+      )
+    );
+    this.summary.rows.push({
+      name: compound.name,
+      fname: compound.name.replace(/\::/g, '-'),
+    });
   },
 
   // Write the output file
   writeFile: function (filepath, contents) {
     logger.verbose('Writing ' + filepath);
     var stream = fs.createWriteStream(filepath);
-    stream.once('open', function(fd) {
+    stream.once('open', function (fd) {
       contents.forEach(function (content) {
-        if (content)
-          stream.write(content);
+        if (content) stream.write(content);
       });
       stream.end();
     });
   },
 
   writeSummary: function (contents, options) {
-    var fp = path.dirname(options.output) + "/SUMMARY.md";
+    var fp = path.dirname(options.output) + '/SUMMARY.md';
     this.writeFile(fp, contents);
-  }
+  },
 };

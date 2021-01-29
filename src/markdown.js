@@ -7,7 +7,6 @@
 'use strict';
 
 module.exports = {
-
   refLink: function (text, refid) {
     return this.link(text, '{#ref ' + refid + ' #}');
   },
@@ -25,10 +24,10 @@ module.exports = {
      * Escaping for a cell in a table.
      **/
     cell: function (text) {
-      return text.replace(/^[\n]+|[\n]+$/g, '') // trim CRLF
-        .replace('/\|/g', '\\|')                // escape the pipe
-        .replace(/\n/g, '<br/>');               // escape CRLF
-    }
-  }
-
+      return text
+        .replace(/^[\n]+|[\n]+$/g, '') // trim CRLF
+        .replace('/|/g', '\\|') // escape the pipe
+        .replace(/\n/g, '<br/>'); // escape CRLF
+    },
+  },
 };

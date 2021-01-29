@@ -1,11 +1,11 @@
-var winston = require("winston");
+var winston = require('winston');
 
 var logger = winston.createLogger({
-  level: "info",
+  level: 'info',
   format: winston.format.json(),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: "moxygen.log" }),
+    new winston.transports.File({ filename: 'moxygen.log' }),
   ],
 });
 
