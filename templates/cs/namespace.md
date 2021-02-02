@@ -12,9 +12,16 @@ Members | Summary
 {{/each}}{{#each filtered.compounds}}{{cell proto}} | {{cell summary}}
 {{/each}}
 
-{{#if filtered.members}}
-
 ## Members
+
+{{#each filtered.compounds}}
+
+### {{title proto}} {{anchor refid}}
+
+{{briefdescription}}
+
+{{detaileddescription}}
+{{/each}}
 
 {{#each filtered.members}}
 
@@ -32,4 +39,3 @@ Values | Descriptions
 {{detaileddescription}}
 
 {{/each}}
-{{/if}}
